@@ -1,36 +1,37 @@
-file=open('laba1.txt')
-sym=file.readline().split()
-r=[int(i) for i in sym] #числа
-n=r[0] #колич. чисел
-s=r[-1] #цель
+with open('laba1.txt', 'r') as f:
+    sym=f.readline().split()
+    ''' Открытие файла и считывание значений '''
+r=[int(i) for i in sym]
+n=r[0]
+s=r[-1]
 r.pop(0)
 r.pop(-1)
-#print(r,n,s)
+''' Присвоение значений переменным '''
 
-def F(numbers,goal,index=0,summ=0,symbols=''):
+def combinations(numbers: list[int],goal:int,index:int,summ:int,symbols:str):
+    ''' Функция исследует все возможные комбинации чисел с операциями сложения и вычитания '''
     if index==len(numbers):
         if summ==goal:
             return symbols+'='+str(goal)
         return None
-    plus=F(numbers,goal, index+1, summ + numbers[index], symbols+'+'+str(numbers[index]))
+    plus=combinations(numbers,goal, index+1, summ + numbers[index], symbols+'+'+str(numbers[index]))
     if plus:
         return plus
-    minus=F(numbers, goal, index+1, summ-numbers[index], symbols+'-'+str(numbers[index]))
+    minus=combinations(numbers, goal, index+1, summ-numbers[index], symbols+'-'+str(numbers[index]))
     if minus:
         return minus
     return None
 
-o=F(r,s,0,0,'')
+o=combinations(r,s,0,0,'')
+''' Приводит в действие функцию '''
 if o:
     if o[0]=='+':
-        #print(o[1:])
-        with open('laba1.txt', 'a') as file:
-            file.write(o[1:]+'\n')
+        ''' Записывает решение в файл '''
+        with open('laba1.txt', 'a') as f:
+            f.write(o[1:]+'\n')
     else:
-        #print(o)
-        with open('laba1.txt', 'a') as file:
-            file.write(o+'\n')
+        with open('laba1.txt', 'a') as f:
+            f.write(o+'\n')
 else:
-    #print('no solution')
-    with open('laba1.txt', 'a') as file:
-        file.write('no solution' + '\n')
+    with open('laba1.txt', 'a') as f:
+        f.write('no solution' + '\n')
