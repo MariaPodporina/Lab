@@ -2,8 +2,6 @@ class Piece:
     def __init__(self, x: int, y: int):
         """
         Инициализирует класс фигуры с возможностью ввести координаты
-        :param x: Координата X
-        :param y: Координата Y
         """
         self.x = x
         self.y = y
@@ -16,8 +14,8 @@ class Board:
     def __init__(self, size: int, occupied: dict = None):
         """
         Инициализирует класс шахматной доски
-        :param size: Размер доски по одной из координат
-        :param occupied: Словарь, с ключом координат ячеек (x, y), и со значением:
+        :size: Размер доски по одной из координат
+        :occupied: Словарь, с ключом координат ячеек (x, y), и со значением:
             -1 - фигура,
             0 - ячейка пуста,
             >0 - ячейка находится под аттакой
@@ -46,7 +44,7 @@ class Board:
     def is_save(self, piece: Piece):
         """
         Проверяет можно ли поставить фигуру
-        :param piece: Принимает экземпляр класса Piece
+        :piece: Принимает экземпляр класса Piece
         :return: Возвращает True, если фигуру можно поставить. False - если фигуру нельзя поставить
         """
         if piece.pos in self.occupied or piece.x > self.size or piece.y > self.size:
@@ -56,7 +54,7 @@ class Board:
     def place(self, piece: Piece):
         """
         Добавляет piece в список фигур и добавляет координаты фигуры и ее ходы во множество occupied
-        :param piece: экземпляр класса Piece
+        :piece: экземпляр класса Piece
         :return: None
         """
         if self.is_save(piece):
@@ -71,7 +69,7 @@ class Board:
     def remove(self, piece: Piece):
         """
         Удаляет фигуру из списка фигур и удаляет фигуру из occupied и минусует каждую атаку данной фигуры на 1
-        :param piece: экземпляр класса Piece
+        :piece: экземпляр класса Piece
         :return: None
         """
         if piece.pos in self.pieces:
@@ -84,8 +82,8 @@ class Chess(Board):
     def __init__(self, size: int, output: str = 'output.txt'):
         """
         Инициализирует класс решения шахмат
-        :param size: размер щахматной доски
-        :param output: файл в который выведется решения
+        :size: размер щахматной доски
+        :output: файл в который выведется решения
         """
         super().__init__(size)
         self.cache = set()
@@ -96,8 +94,8 @@ class Chess(Board):
     def algorithm(self, piece: Piece=Piece(0, 0), l = 0) -> None:
         """
         Вызывается для нахождения и вывода в файл всех найденых решений
-        :param piece: экземпляр класса Piece
-        :param l: Число фигур которые необходимо расставить
+        :piece: экземпляр класса Piece
+        :l: Число фигур которые необходимо расставить
         :return: None
         """
         if l == 0:
@@ -124,8 +122,8 @@ class Chess(Board):
     def first_sol(self, piece: Piece=Piece(0, 0), l = 0) -> list:
         """
         Вызывается для нахождения первого решения, ничего не выводит в файл
-        :param piece: экземпляр класса Piece
-        :param l: Число фигур, которые необходимо расставить
+        :piece: экземпляр класса Piece
+        :l: Число фигур, которые необходимо расставить
         :return: Первое найденное решение. Список с кортежами, состоящих из координат x и y
         """
         if l == 0:
@@ -148,7 +146,7 @@ class Chess(Board):
     def write(self, l: int):
         """
         Обвёртка для функции алгоритма открывающая и закрывающая файл
-        :param l: Число фигур, которые необходимо расставить
+        :l: Число фигур, которые необходимо расставить
         :return:
         """
         self.f = open(self.output, 'w')
@@ -158,7 +156,7 @@ class Chess(Board):
     def compute_first(self, l: int) -> list[tuple[int, int]]:
         """
         Обвёртка для функции нахождения первого решения
-        :param l: Числофигур, которые необходимо расставить
+        :l: Числофигур, которые необходимо расставить
         :return: Первое найденное решение. Список с кортежами, состоящих из координат x и y
         """
         sol = self.first_sol(l=l)
@@ -169,7 +167,7 @@ class Chess(Board):
     def place(self, piece: Piece) -> None:
         """
         Обвёртка для родительской функции place, сохраняющей координаты (x, y) в списке const_pieces
-        :param piece: Фигура. Экземпляр класса Piece
+        :piece: Фигура. Экземпляр класса Piece
         :return: None
         """
         self.const_pieces.append(piece.pos)
