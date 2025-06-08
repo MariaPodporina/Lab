@@ -18,12 +18,15 @@ MAIN_WINDOW_SIZE = QSize(400, 150)
 
 class MainWindow(QMainWindow):
     def __init__(self):
+        """
+        Инициализатор класса основного окна
+        :return: None
+        """
         super().__init__()
 
         self.setWindowTitle("Шахматы")
         self.setFixedSize(MAIN_WINDOW_SIZE)
         self.coord : list = []
-        self.thread_pool = QThreadPool()
 
         # Поля ввода
         self.inputSize = QLineEdit()
@@ -76,6 +79,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(wdg)
 
     def validator(self):
+        """
+        Активирует или отключает кнопки после того как пользователь что то ввел
+        :return: None
+        """
         is_size_correct = self.inputSize.text().isdigit()
         is_L_correct = self.inputL.text().isdigit()
         is_const_correct = self.inputConst.text().isdigit()
@@ -91,6 +98,10 @@ class MainWindow(QMainWindow):
             self.bt_draw_board.setEnabled(False)
 
     def bt_coord_clicked(self):
+        """
+        Вызывает модальное окно для ввода координат фигур
+        :return: None
+        """
         const = int(self.inputConst.text())
         size = int(self.inputSize.text())
 
@@ -101,6 +112,11 @@ class MainWindow(QMainWindow):
         self.validator()
 
     def draw_board(self):
+        """
+        Вызывает модальное окно с шахматной доской и возможностью записать решения в файл. Если решений не найдено,
+        то создает окно с надписью, что решений нет
+        :return: None
+        """
         l = int(self.inputL.text())
         size = int(self.inputSize.text())
         chess = Chess(size)
@@ -110,7 +126,6 @@ class MainWindow(QMainWindow):
             dlg = QDialog()
             label = QLabel("Нет Решений!")
             bt = QPushButton("Ок")
-            bt.clicked.connect(dlg.close)
             layout = QVBoxLayout()
             layout.addWidget(label)
             layout.addWidget(bt)

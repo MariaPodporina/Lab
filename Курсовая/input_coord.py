@@ -10,12 +10,19 @@ from chess import Board, Piece
 
 class InputCoord(QDialog):
     def __init__(self, const: int, size: int, parent):
+        """
+        Инициализатор окна ввода координат
+        :param const: Количество фигур, которые необходимо расставить
+        :param size: Размер шахматной доски
+        :param parent: Родительский ласс, который вызвал данный класс
+        """
         super().__init__(parent)
         self.setWindowTitle("Ввод Координат")
         self.setModal(True)
-        self.coords = []
-        self.size = size
-        self.inputs = []
+
+        self.coords: list[tuple[int,int]] = []
+        self.size: int = size
+        self.inputs: list[str] = []
         layout = QVBoxLayout()
 
         for i in range(const):
@@ -53,12 +60,15 @@ class InputCoord(QDialog):
         self.setLayout(layout)
 
     def validator(self):
+        """
+        Валидатор вводимых координат пользователем. Активирует кнопку подтверждения
+        :return: None
+        """
         is_valid = True
         board = Board(self.size)
 
         for line in self.inputs:
             text = line.text().strip()
-            #print(text)
             try:
                 x, y = map(int, text.split())
                 if board.is_save(Piece(x, y)):
@@ -67,6 +77,5 @@ class InputCoord(QDialog):
                     is_valid = False
             except:
                 is_valid = False
-        #print(board.pieces)
         self.coords = board.pieces
         self.bt_accept.setEnabled(is_valid)

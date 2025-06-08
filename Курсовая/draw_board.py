@@ -6,36 +6,67 @@ from PySide6.QtWidgets import (
     QGraphicsView,
     QGraphicsRectItem,
     QDialog,
-    QSizePolicy
+    QSizePolicy,
+    QLabel,
 )
-from PySide6.QtCore import Qt, QSize, QRunnable
+from PySide6.QtCore import Qt, QRunnable, QThreadPool
 from PySide6.QtGui import QPen
 from functools import partial
 from chess import Chess, Piece
 
+# Константы для отображения доски с фигурами
 TILE_SIZE = 50
 TILE_COLOR = Qt.white
 TILE_WITH_PIECE_COLOR = Qt.green
 TILE_WITH_AUTO_PIECE_COLOR = Qt.blue
 TILE_ATTACKED_COLOR = Qt.red
 
-
 class Worker(QRunnable):
-    def __init__(self, task):
+    def __init__(self, task, parent=None):
+        """
+        Инициализирует рабочего метод которого будет запущен в другом потоке
+        :param task: Функция, которая будет запущена в другом потоке
+        :param parent: Родительский класс
+        """
         super().__init__()
         self.task = task
+        self.parent = parent
 
     def run(self):
+        """
+        Вызывается в другом потоке. Записывает результаты решения шахмат в файл и выводит сообщение об их успешной записи
+        :return: None
+        """
         self.task()
+        dlg = QDialog(self.parent)
+        dlg.setFixedSize(400, 100)
+        text = QLabel("Решения были успешно записаны в файл!")
+        text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        bt = QPushButton("Ок")
+        bt.clicked.connect(dlg.close)
+        layout = QVBoxLayout()
+        layout.addWidget(text)
+        layout.addWidget(bt)
+        dlg.setLayout(layout)
+        dlg.exec()
 
 class DrawBoard(QDialog):
-    def __init__(self, size, l,coords, parent):
+    def __init__(self, size, l, coords, parent):
+        """
+        Инициализирует класс окна вывода шахматной доски
+        :param size: Размер шахматной доски
+        :param l: Количество фигур, необходимых расставить
+        :param coords: Список координат фигур уже поставленных
+        :param parent: Родительский класс
+        """
         super().__init__(parent)
+        print(coords)
         self.parent = parent
-        self.size = size
-        self.coords = coords
-        self.l = l
-        self.chess = Chess(size)
+        self.size: int = size
+        self.coords: list[tuple[int, int]] = coords
+        self.l: int = l
+        self.chess: Chess = Chess(size)
+        self.thread_pool = QThreadPool()
         for i in coords:
             self.chess.place(Piece(i[0], i[1]))
 
@@ -92,9 +123,13 @@ class DrawBoard(QDialog):
         self.setLayout(self.layout)
 
     def write(self):
+        """
+        Вызывается для нахождения решений шахмат и ввод их в файл
+        :return: None
+        """
         self.chess = Chess(self.size)
         for i in self.coords:
             self.chess.place(Piece(i[0], i[1]))
         task = partial(self.chess.write, self.l)
-        worker = Worker(task)
-        self.parent.thread_pool.start(worker)
+        worker = Worker(task, self)
+        self.thread_pool.start(worker)
